@@ -268,5 +268,6 @@ return [
         'username'                 => 'nom d\'utilisateur',
         'value'                    => 'valeur',
         'year'                     => 'année',
+        
     ],
 ];
