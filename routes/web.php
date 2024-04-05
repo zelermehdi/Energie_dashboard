@@ -1,8 +1,14 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -30,3 +36,22 @@ Route::middleware('auth')->group(function () {
 });
 Route::get('/dashboard/energy-production-chart', [DashboardController::class, 'energyProductionChart'])->name('dashboard.energyProductionChart');
 require __DIR__.'/auth.php';
+
+Route::get('/google-auth/redirect', function () {
+    return Socialite::driver('google')->redirect();
+});
+ 
+Route::get('/google-auth/callback', function () {
+    $user_google = Socialite::driver('google')->user();
+ 
+    $user = User::updateOrCreate([
+        'email' => $user_google->email, 
+    ], [
+        'name' => $user_google->name,
+        'password' => Hash::make(Str::random(24)), 
+    ]);
+
+    Auth::login($user);
+ 
+    return redirect('/dashboard');
+});
